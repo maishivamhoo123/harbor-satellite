@@ -27,7 +27,7 @@ curl -Lo ground-control.tar.gz \
 tar xzf ground-control.tar.gz
 ```
 
-Create a `.env` file (see `ground-control/.env.example` for all options):
+Create a `.env` file (see `.env.example` for all options):
 
 ```bash
 cat > .env << 'EOF'
@@ -51,11 +51,10 @@ Run (requires a running PostgreSQL instance):
 
 ### Ground Control Docker Compose
 
-The [`ground-control/docker-compose.yml`](https://github.com/container-registry/harbor-satellite/blob/main/ground-control/docker-compose.yml) in the repository runs Ground Control with PostgreSQL:
+The [`docker-compose.yml`](https://github.com/container-registry/harbor-satellite/blob/main/docker-compose.yml) in the repository runs Ground Control with PostgreSQL:
 
 ```bash
-cd ground-control
-docker compose up -d
+docker compose up -d postgres ground-control
 ```
 
 Override defaults with environment variables:
@@ -63,7 +62,7 @@ Override defaults with environment variables:
 ```bash
 HARBOR_URL=https://my-harbor.example.com \
 HARBOR_PASSWORD=MyPassword \
-docker compose up -d
+docker compose up -d postgres ground-control
 ```
 
 Verify:
@@ -78,10 +77,10 @@ curl http://localhost:8080/health
 The Helm chart is experimental and not fully tested. Use it at your own risk in production environments.
 {{< /callout >}}
 
-Install with the [Helm chart](https://github.com/container-registry/harbor-satellite/tree/main/deploy/helm/ground-control):
+Install with the [Helm chart](https://github.com/container-registry/harbor-satellite/tree/main/examples/deploy/helm/ground-control):
 
 ```bash
-helm install ground-control deploy/helm/ground-control \
+helm install ground-control examples/deploy/helm/ground-control \
   --set harbor.url=https://harbor.example.com \
   --set harbor.username=admin \
   --set harbor.password=Harbor12345 \
@@ -91,7 +90,7 @@ helm install ground-control deploy/helm/ground-control \
 This deploys Ground Control and an internal PostgreSQL StatefulSet. To use an external database:
 
 ```bash
-helm install ground-control deploy/helm/ground-control \
+helm install ground-control examples/deploy/helm/ground-control \
   --set harbor.url=https://harbor.example.com \
   --set harbor.username=admin \
   --set harbor.password=Harbor12345 \
@@ -104,14 +103,14 @@ helm install ground-control deploy/helm/ground-control \
 To enable SPIFFE:
 
 ```bash
-helm install ground-control deploy/helm/ground-control \
+helm install ground-control examples/deploy/helm/ground-control \
   --set spiffe.enabled=true \
   --set spiffe.trustDomain=harbor-satellite.local \
   --set harbor.url=https://harbor.example.com \
   --set harbor.password=Harbor12345
 ```
 
-See `deploy/helm/ground-control/values.yaml` for all configurable values.
+See `examples/deploy/helm/ground-control/values.yaml` for all configurable values.
 
 ## Installing Satellite
 
@@ -140,7 +139,7 @@ See the [releases page](https://github.com/container-registry/harbor-satellite/r
 ```bash
 git clone https://github.com/container-registry/harbor-satellite.git
 cd harbor-satellite
-go build -o harbor-satellite cmd/main.go
+go build -o harbor-satellite ./cmd/harbor-satellite
 ```
 
 Run with token-based auth:
@@ -216,7 +215,7 @@ Best for development and testing. No SPIFFE infrastructure needed.
 3. Copy the token from the response
 4. Pass it to the satellite binary with `--token`
 
-For a full token-based walkthrough, see [deploy/no-spiffe/quickstart.md](https://github.com/container-registry/harbor-satellite/blob/main/deploy/no-spiffe/quickstart.md).
+For a full token-based walkthrough, see [examples/deploy/no-spiffe/quickstart.md](https://github.com/container-registry/harbor-satellite/blob/main/examples/deploy/no-spiffe/quickstart.md).
 
 ### SPIFFE/SPIRE (Production)
 
